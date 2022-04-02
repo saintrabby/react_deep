@@ -8,8 +8,6 @@ import { Grid, Image, Text } from '../elements/index'
 
 const Post = (props) => {
 
-    console.log(props)
-
     return (
         <React.Fragment>
             <Grid padding='16px'>
