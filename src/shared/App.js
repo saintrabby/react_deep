@@ -1,7 +1,7 @@
 // import logo from '../logo.svg';
 
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { ConnectedRouter } from 'connected-react-router';
 import { history } from '../redux/configStore';
 
@@ -21,17 +21,15 @@ function App() {
       <React.Fragment>
         <Grid>
           <Header></Header>
-          {/* <ConnectedRouter history={history}> */}
-            <BrowserRouter history={history}>
+          <ConnectedRouter history={history}>
+          {/* <BrowserRouter history={history}> */}
             {/* <div className="App">
       </div> */}
-            <Routes>
               <Route path='/' element={<PostList />} />
               <Route path='/login' element={<Login />} />
               <Route path='/signup' element={<Signup />} />
-            </Routes>
-            </BrowserRouter>
-          {/* </ConnectedRouter> */}
+          {/* </BrowserRouter> */}
+          </ConnectedRouter>
         </Grid>
       </React.Fragment>
     </Provider>
