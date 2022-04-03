@@ -1,17 +1,20 @@
 import React from "react";
+import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
 import { Text, Input, Grid, Button } from "../elements";
 
 import { deleteCookie, getCookie, setCookie } from '../shared/Cookie'
 
+import { actionCreators as userActions } from "../redux/modules/user";
+
 const Login = (props) => {
 
   const history = useHistory()
-  
-    const login = () => {
-        setCookie('user_id', 'name', 3);
-        setCookie('user_pw', 'pppp', 3);
-    }
+  const dispatch = useDispatch()
+
+  const login = () => {
+    dispatch(userActions.loginAction({ user_name: 'ego' }))
+  }
 
   return (
     <React.Fragment>
@@ -44,7 +47,6 @@ const Login = (props) => {
           text="로그인하기"
           _onClick={() => {
             console.log("로그인 했어!");
-            history.push('/')
             login()
           }}
         ></Button>

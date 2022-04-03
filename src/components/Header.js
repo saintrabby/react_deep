@@ -1,23 +1,16 @@
 import React from "react";
-import { useHistory } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
 import { Grid, Text, Button } from "../elements";
+import { actionCreators as userActions } from "../redux/modules/user";
 import { deleteCookie, getCookie, setCookie } from "../shared/Cookie";
 
 
 const Header = () => {
-    const [is_login, setIsLogin] = React.useState(false)
+    const is_login = useSelector((state) => state.user.is_login)
 
-    React.useEffect(() => {
-        let cookie = getCookie('user_id')
-        console.log(cookie)
+    const dispatch = useDispatch()
 
-        if (cookie) {
-            setIsLogin(true)
-        }
-        else {
-            setIsLogin(false)
-        }
-    }, [is_login])
+    // const [is_login, setIsLogin] = React.useState(false)
 
     if (is_login) {
         return (
@@ -31,8 +24,7 @@ const Header = () => {
                         <Button text='내정보'></Button>
                         <Button text='알림'></Button>
                         <Button text='로그아웃' _onClick={() => {
-                            deleteCookie('user_id')
-                            deleteCookie('user_pw')
+                            dispatch(userActions.logOut({}))
                         }}></Button>
                     </Grid>
                 </Grid>
