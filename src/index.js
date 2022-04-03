@@ -4,6 +4,9 @@ import './index.css';
 import App from './shared/App';
 import reportWebVitals from './reportWebVitals';
 
+import { Provider } from 'react-redux';
+import store from './redux/configStore'
+
 // ReactDOM.render(
 //   <React.StrictMode>
 //     <App />
@@ -15,6 +18,11 @@ import reportWebVitals from './reportWebVitals';
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />)
+
+root.render(
+    <Provider store={store}>
+        <App />
+    </Provider>
+)
 
 reportWebVitals();
