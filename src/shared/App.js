@@ -47,6 +47,7 @@ function App() {
           <Route exact path='/login' component={Login} />
           <Route exact path='/signup' component={Signup} />
           <Route exact path='/write' component={PostWrite} />
+          <Route exact path='/write/:id' component={PostWrite} />
           <Route exact path='/post/:id' component={PostDetail} />
 
         </ConnectedRouter>

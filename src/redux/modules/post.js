@@ -1,6 +1,6 @@
 import { createAction, handleActions } from "redux-actions";
 import { produce } from 'immer'
-import { addDoc, collection, getDocs } from "@firebase/firestore";
+import { addDoc, collection, doc, getDocs, updateDoc } from "@firebase/firestore";
 import { firestore, storage } from "../../shared/firebase";
 import { moment } from "moment";
 import { getDownloadURL, ref, uploadBytesResumable, uploadString } from "@firebase/storage";
@@ -9,9 +9,13 @@ import { actionCreators as imageActions } from "./image";
 
 const SET_POST = 'SET_POST'
 const ADD_POST = 'ADD_POST'
+const EDIT_POST = 'EDIT_POST'
+const DEL_POST = 'DEL_POST'
 
 const setPost = createAction(SET_POST, (post_list) => ({ post_list }))
 const addPost = createAction(ADD_POST, (post) => ({ post }))
+const editPost = createAction(EDIT_POST, (post_id, post) => ({ post_id, post }))
+const delPost = createAction(DEL_POST, (post) => ({ post }))
 
 const initialState = {
     list: [],
@@ -50,8 +54,6 @@ const addPostFB = (contents = '') => {
 
         const _image = getState().image.preview
 
-        console.log(getState())
-
         const imgRef = ref(storage, `images/${user_info.user_id}_${new Date().getTime()}`)
 
         let snapshot = await uploadString(imgRef, _image, 'data_url')
@@ -74,11 +76,6 @@ const addPostFB = (contents = '') => {
         }).catch((err) => {
             console.log(err)
         })
-
-
-
-
-
 
         // const message4 = 'data:text/plain;base64,5b6p5Y+344GX44G+44GX44Gf77yB44GK44KB44Gn44Go44GG77yB';
         // uploadString(storageRef, message4, 'data_url').then((snapshot) => {
@@ -137,6 +134,67 @@ const getPostFB = () => {
     }
 }
 
+const editPostFB = (post_id = null, post = {}) => {
+    return async function (dispatch, getState, { history }) {
+
+        if (!post_id) { return }
+
+        const _image = getState().image.preview
+
+        const _post_idx = getState().post.list.findIndex((p) => p.id === post_id)
+        const _post = getState().post.list[_post_idx]
+
+        // const postDB = await getDocs(collection(firestore, 'post'))
+
+        console.log(post_id)
+        // console.log({ ...post })
+
+        // console.log(_image, _post.img_url)
+
+        if (_image === _post.img_url) {
+            const docRef = doc(firestore, 'post', post_id)
+
+            console.log(docRef)
+
+            await updateDoc(docRef, post)
+
+            dispatch(editPost(post_id, { ...post }))
+
+            history.replace('/')
+        }
+        else {
+            const user_id = getState().user.user.uid
+
+            const imgRef = ref(storage, `images/${user_id}_${new Date().getTime()}`)
+
+            let snapshot = await uploadString(imgRef, _image, 'data_url')
+
+            let downloadURL = await getDownloadURL(snapshot.ref)
+
+            dispatch(imageActions.uploadImage(downloadURL))
+
+
+
+            const docRef = doc(firestore, 'post', post_id)
+
+            await updateDoc(docRef, { ...post, img_url: downloadURL })
+
+            dispatch(editPost(post_id, { ...post, img_url: downloadURL }))
+
+            history.replace('/')
+        }
+
+    }
+}
+
+const delPostFB = (in_post) => {
+    return async function (dispatch, getState, { history }) {
+        const postDB = await getDocs(collection(firestore, 'post'))
+
+        console.log(in_post);
+    }
+}
+
 export default handleActions(
     {
         [SET_POST]: (state, action) => produce(state, (draft) => {
@@ -144,6 +202,14 @@ export default handleActions(
         }),
         [ADD_POST]: (state, action) => produce(state, (draft) => {
             draft.list.unshift(action.payload.post)
+        }),
+        [EDIT_POST]: (state, action) => produce(state, (draft) => {
+            let idx = draft.list.findIndex((p) => p.id === action.payload.post_id)
+
+            draft.list[idx] = { ...draft.list[idx], ...action.payload.post }
+        }),
+        [DEL_POST]: (state, action) => produce(state, (draft) => {
+            // draft.list
         }),
     }, initialState
 )
@@ -153,6 +219,8 @@ const actionCreators = {
     addPost,
     addPostFB,
     getPostFB,
+    editPostFB,
+    delPostFB,
 }
 
 export { actionCreators };

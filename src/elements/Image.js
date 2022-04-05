@@ -1,13 +1,22 @@
 import React from "react"
+import { useHistory, useParams } from "react-router"
 import styled from 'styled-components'
 
 const Image = (props) => {
+
+    // const param = useParams()
 
     const { shape, src, size } = props
 
     const styles = {
         src, size
     }
+
+    // const history = useHistory()
+
+    // const goDetail = () => {
+    //     history.push('/detail/' + param)
+    // }
 
     if (shape === 'circle') {
         return (

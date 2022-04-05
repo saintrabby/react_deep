@@ -3,17 +3,38 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button, Grid, Image, Input, Text } from "../elements"
 import Upload from "../shared/Upload";
 import { actionCreators as postActions } from "../redux/modules/post";
+import { actionCreators as imageActions } from "../redux/modules/image";
 
 const PostWrite = (props) => {
 
     const is_login = useSelector((state) => state.user.is_login)
     const preview = useSelector((state) => state.image.preview)
+    const post_list = useSelector((state) => state.post.list)
 
     const dispatch = useDispatch()
 
+    console.log(props.match.params.id)
+
+    const post_id = props.match.params.id
+    const is_edit = post_id ? true : false
+    let _post = is_edit ? post_list.find((p) => p.id === post_id) : null
+
+    console.log(_post)
+
     const { history } = props
 
-    const [contents, setContents] = React.useState('')
+    const [contents, setContents] = React.useState(_post ? _post.contents : '')
+
+    React.useEffect(() => {
+        if (is_edit && !_post) {
+            console.log('?')
+            history.goBack()
+        }
+
+        if (is_edit) {
+            dispatch(imageActions.setPreview(_post.img_url))
+        }
+    }, [])
 
     const ChangeContents = (e) => {
         setContents(e.target.value)
@@ -21,6 +42,10 @@ const PostWrite = (props) => {
 
     const addPost = () => {
         dispatch(postActions.addPostFB(contents))
+    }
+
+    const editPost = () => {
+        dispatch(postActions.editPostFB(post_id, {contents}))
     }
 
     if (!is_login) {
@@ -36,7 +61,7 @@ const PostWrite = (props) => {
     return (
         <React.Fragment>
             <Grid padding='16px'>
-                <Text size='36px' bold>게시글 작성</Text>
+                <Text size='36px' bold>{is_edit ? '게시글 수정' : '게시글 작성'}</Text>
                 <Upload />
             </Grid>
 
@@ -49,11 +74,15 @@ const PostWrite = (props) => {
             </Grid>
 
             <Grid padding='16px'>
-                <Input multiLine label='게시글 내용' placeholder='게시글 작성' _onChange={(e) => ChangeContents(e)} />
+                <Input value={contents} multiLine label='게시글 내용' placeholder='게시글 작성' _onChange={(e) => ChangeContents(e)} />
             </Grid>
 
             <Grid padding='16px'>
-                <Button text='게시글 작성' _onClick={() => addPost()}></Button>
+                {is_edit ? (
+                    <Button text='게시글 수정' _onClick={() => editPost()}></Button>
+                ) : (
+                    <Button text='게시글 작성' _onClick={() => addPost()}></Button>
+                )}
             </Grid>
         </React.Fragment>
     )
