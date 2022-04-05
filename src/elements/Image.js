@@ -35,8 +35,9 @@ Image.defaultProps = {
 }
 
 const Outter = styled.div`
-    width: 50%;
+    width: 95%;
     min-width: 250px;
+    margin: 16px;
 `
 
 const Inner = styled.div`

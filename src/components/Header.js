@@ -20,7 +20,7 @@ const Header = () => {
 
     // const [is_login, setIsLogin] = React.useState(false)
 
-
+    
 
     if (is_login && is_session) {
         return (
@@ -44,16 +44,16 @@ const Header = () => {
 
     return (
         <React.Fragment>
-            <Grid is_flex >
+            <Grid is_flex padding='16px'>
                 <Grid>
                     <Text margin='0px' size='24px' bold>헬로</Text>
                 </Grid>
 
                 <Grid is_flex >
-                    <Button text='로그인' _onClick={() => {
+                    <Button margin='0px 2px' text='로그인' _onClick={() => {
                         history.push('/login')
                     }}></Button>
-                    <Button text='회원가입' _onClick={() => {
+                    <Button margin='0px 2px' text='회원가입' _onClick={() => {
                         history.push('/signup')
                     }}></Button>
                 </Grid>
