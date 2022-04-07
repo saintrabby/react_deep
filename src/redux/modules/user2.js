@@ -29,7 +29,7 @@ const loginFB = (id, pwd) => {
             auth
                 .signInWithEmailAndPassword(id, pwd)
                 .then((user) => {
-                    console.log(user);
+                    // console.log(user);
 
                     dispatch(
                         setUser({
@@ -57,7 +57,7 @@ const signupFB = (id, pwd, user_name) => {
         auth
             .createUserWithEmailAndPassword(id, pwd)
             .then((user) => {
-                console.log(user);
+                // console.log(user);
 
                 auth.currentUser
                     .updateProfile({

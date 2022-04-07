@@ -38,7 +38,7 @@ function App() {
   return (
 
     <React.Fragment>
-      <Grid>
+      <Grid margin='auto'>
         <Header></Header>
         {/* <div className="App"></div> */}
         <ConnectedRouter history={history}>
@@ -52,9 +52,6 @@ function App() {
 
         </ConnectedRouter>
       </Grid>
-      <Permit>
-        <Button is_float text='+' _onClick={() => { history.push('/write') }}></Button>
-      </Permit>
     </React.Fragment>
 
   );

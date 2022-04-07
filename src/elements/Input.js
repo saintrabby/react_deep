@@ -37,6 +37,7 @@ Input.defalutProps = {
 const ElTextarea = styled.textarea`
     border: 1px solid #212121;
     width: 100%;
+    /* max-width: 480px; */
     padding: 12px 4px;
     box-sizing: border-box;
 `

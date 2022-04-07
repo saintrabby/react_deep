@@ -1,6 +1,6 @@
 import { createAction, handleActions } from "redux-actions";
 import { produce } from 'immer'
-import { addDoc, collection, doc, getDocs, updateDoc } from "@firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "@firebase/firestore";
 import { firestore, storage } from "../../shared/firebase";
 import { moment } from "moment";
 import { getDownloadURL, ref, uploadBytesResumable, uploadString } from "@firebase/storage";
@@ -11,11 +11,13 @@ const SET_POST = 'SET_POST'
 const ADD_POST = 'ADD_POST'
 const EDIT_POST = 'EDIT_POST'
 const DEL_POST = 'DEL_POST'
+const LIKE_POST = 'LIKE_POST'
 
 const setPost = createAction(SET_POST, (post_list) => ({ post_list }))
 const addPost = createAction(ADD_POST, (post) => ({ post }))
 const editPost = createAction(EDIT_POST, (post_id, post) => ({ post_id, post }))
 const delPost = createAction(DEL_POST, (post) => ({ post }))
+const likePost = createAction(LIKE_POST, (post) => ({ post }))
 
 const initialState = {
     list: [],
@@ -33,7 +35,7 @@ const initialPost = {
     insert_dt: require('moment')().format('YYYY-MM-DD hh:mm:ss'),
 }
 
-const addPostFB = (contents = '') => {
+const addPostFB = (contents = '', form) => {
     return async function (dispatch, getState, { history }) {
 
         // const postDB = await getDocs(collection(firestore, 'post'))
@@ -62,10 +64,10 @@ const addPostFB = (contents = '') => {
 
         dispatch(imageActions.uploadImage(downloadURL))
 
-        let new_post = { ...user_info, ..._post, img_url: downloadURL }
+        let new_post = { ...user_info, ..._post, img_url: downloadURL, Form: form }
 
         addDoc(collection(firestore, 'post'), new_post).then((doc) => {
-            let post = { user_info, ..._post, id: doc.id, img_url: downloadURL }
+            let post = { user_info, ..._post, id: doc.id, img_url: downloadURL, Form: form }
 
             dispatch(addPost(post))
 
@@ -77,10 +79,7 @@ const addPostFB = (contents = '') => {
             console.log(err)
         })
 
-        // const message4 = 'data:text/plain;base64,5b6p5Y+344GX44G+44GX44Gf77yB44GK44KB44Gn44Go44GG77yB';
-        // uploadString(storageRef, message4, 'data_url').then((snapshot) => {
-        //     console.log('Uploaded a data_url string!');
-        // });
+
     }
 }
 
@@ -89,7 +88,7 @@ const getPostFB = () => {
 
         const postDB = await getDocs(collection(firestore, 'post'))
 
-        console.log(postDB)
+        // console.log(postDB)
 
         let post_list = []
 
@@ -134,7 +133,7 @@ const getPostFB = () => {
     }
 }
 
-const editPostFB = (post_id = null, post = {}) => {
+const editPostFB = (post_id = null, post = {}, form) => {
     return async function (dispatch, getState, { history }) {
 
         if (!post_id) { return }
@@ -146,7 +145,7 @@ const editPostFB = (post_id = null, post = {}) => {
 
         // const postDB = await getDocs(collection(firestore, 'post'))
 
-        console.log(post_id)
+        // console.log(post_id)
         // console.log({ ...post })
 
         // console.log(_image, _post.img_url)
@@ -154,11 +153,11 @@ const editPostFB = (post_id = null, post = {}) => {
         if (_image === _post.img_url) {
             const docRef = doc(firestore, 'post', post_id)
 
-            console.log(docRef)
+            // console.log(docRef)
 
-            await updateDoc(docRef, post)
+            await updateDoc(docRef, { ...post, Form: form })
 
-            dispatch(editPost(post_id, { ...post }))
+            dispatch(editPost(post_id, { ...post, Form: form }))
 
             history.replace('/')
         }
@@ -177,9 +176,9 @@ const editPostFB = (post_id = null, post = {}) => {
 
             const docRef = doc(firestore, 'post', post_id)
 
-            await updateDoc(docRef, { ...post, img_url: downloadURL })
+            await updateDoc(docRef, { ...post, img_url: downloadURL, Form: form })
 
-            dispatch(editPost(post_id, { ...post, img_url: downloadURL }))
+            dispatch(editPost(post_id, { ...post, img_url: downloadURL, Form: form }))
 
             history.replace('/')
         }
@@ -189,27 +188,71 @@ const editPostFB = (post_id = null, post = {}) => {
 
 const delPostFB = (in_post) => {
     return async function (dispatch, getState, { history }) {
-        const postDB = await getDocs(collection(firestore, 'post'))
 
-        console.log(in_post);
+        const docRef = doc(firestore, 'post', in_post.id)
+
+        deleteDoc(docRef)
+
+        // console.log(in_post.id);
+
+        dispatch(delPost(in_post))
+    }
+}
+
+const likePostFB = (in_post) => {
+    return async function (dispatch, getState, { history }) {
+
+        // const docRef = await doc(firestore, 'post', in_post.id)
+
+        // console.log(in_post);
+
+        // console.log(getState().user.id);
+
+        // await updateDoc(docRef, { i_like: getState().user.id })
+
+        // if (!in_post.i_like) {
+        //     updateDoc(docRef, { comment_cnt: in_post.comment_cnt + 1 })
+        // }
+        // else {
+        //     updateDoc(docRef, { comment_cnt: in_post.comment_cnt - 1 })
+        // }
+
+        // dispatch(likePost(in_post))
     }
 }
 
 export default handleActions(
     {
         [SET_POST]: (state, action) => produce(state, (draft) => {
+            action.payload.post_list.sort((a, b) => (new Date(b.insert_dt).getTime() - new Date(a.insert_dt).getTime()))
             draft.list = action.payload.post_list
         }),
         [ADD_POST]: (state, action) => produce(state, (draft) => {
+            // console.log(action.payload)
             draft.list.unshift(action.payload.post)
         }),
         [EDIT_POST]: (state, action) => produce(state, (draft) => {
+            // console.log(action.payload)
+
             let idx = draft.list.findIndex((p) => p.id === action.payload.post_id)
 
             draft.list[idx] = { ...draft.list[idx], ...action.payload.post }
         }),
+        [LIKE_POST]: (state, action) => produce(state, (draft) => {
+            let idx = state.list.findIndex((p) => p.id === action.payload.post.id)
+
+            if (!action.payload.post.i_like)
+                draft.list[idx] = { ...draft.list[idx], comment_cnt: action.payload.post.comment_cnt + 1 }
+            else
+                draft.list[idx] = { ...draft.list[idx], comment_cnt: action.payload.post.comment_cnt - 1 }
+
+            draft.list[idx] = { ...draft.list[idx], i_like: !action.payload.post.i_like }
+
+            // console.log(state, action, idx)
+        }),
         [DEL_POST]: (state, action) => produce(state, (draft) => {
-            // draft.list
+            draft.list = state.list.filter((v) => (v.id !== action.payload.post.id))
+            // console.log(draft.list)
         }),
     }, initialState
 )
@@ -217,10 +260,13 @@ export default handleActions(
 const actionCreators = {
     setPost,
     addPost,
+    delPost,
+    likePost,
     addPostFB,
     getPostFB,
     editPostFB,
     delPostFB,
+    likePostFB,
 }
 
 export { actionCreators };

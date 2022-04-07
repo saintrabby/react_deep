@@ -41,6 +41,7 @@ const ELButton = styled.button`
     padding: 12px 0px;
     box-sizing: border-box;
     border: none;
+    border-radius: 10px;
     :hover {
         background-color: #666;
         cursor: pointer;

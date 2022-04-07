@@ -16,7 +16,7 @@ const Login = (props) => {
   const dispatch = useDispatch()
 
   const login = () => {
-    console.log(id)
+    // console.log(id)
     
     if (id === '' || pw === '') {
       window.alert('모두 입력해주세요')
@@ -62,7 +62,7 @@ const Login = (props) => {
         <Button
           text="로그인하기"
           _onClick={() => {
-            console.log("로그인 했어!");
+            // console.log("로그인 했어!");
             login()
           }}
         ></Button>

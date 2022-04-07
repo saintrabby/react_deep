@@ -10,7 +10,7 @@ const Permit = (props) => {
     
     const is_session = sessionStorage.getItem(session_key) ? true : false
     
-    console.log(is_session, is_login)
+    // console.log(is_session, is_login)
 
     if(is_session && is_login) {
         return (

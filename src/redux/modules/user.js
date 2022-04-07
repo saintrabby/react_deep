@@ -53,7 +53,7 @@ const loginFB = (id, pw) => {
                         // Signed in
                         const user = userCredential.user;
                         // ...
-                        console.log(user)
+                        // console.log(user)
                         dispatch(setUser({ user_name: user.displayName, id, user_profile: '', uid: user.uid }))
 
                         history.push('/');
@@ -88,7 +88,7 @@ const signupFB = (id, pw, name) => {
                 // Signed in
                 const user = userCredential.user;
                 // ...
-                console.log(user)
+                // console.log(user)
 
                 updateProfile(auth.currentUser, {
                     displayName: name
